@@ -27,6 +27,8 @@ import { SITE_TITLE, SITE_DESCRIPTION, SITE_SOCIAL_IMAGE } from "../consts";
           Detect Features
         </h1>
 
+        <button class="dark:text-white my-4" id="test-set">Test set doc</button>
+
         <div class="w-full max-w-2xl mt-8 grid grid-cols-2 gap-8">
           <Article id="session-storage">
             <Fragment slot="title">SessionStorage</Fragment>
@@ -51,6 +53,10 @@ import { SITE_TITLE, SITE_DESCRIPTION, SITE_SOCIAL_IMAGE } from "../consts";
       <Background />
 
       <script>
+        import {
+          setDoc
+        } from "@junobuild/core";
+
         const testSessionStorage = async (): Promise<boolean> => {
           if (!("sessionStorage" in window)) {
             return false;
@@ -154,6 +160,25 @@ import { SITE_TITLE, SITE_DESCRIPTION, SITE_SOCIAL_IMAGE } from "../consts";
         };
 
         document.addEventListener("DOMContentLoaded", testStorages);
+
+        const testSetDoc = async () => {
+          await setDoc({
+            collection: "test",
+            doc: {
+              key: crypto.randomUUID(),
+              data: {
+                hello: "world"
+              },
+            },
+            satellite: {
+              satelliteId: import.meta.env.PUBLIC_SATELLITE_ID
+            }
+          });
+        }
+
+        document
+            .querySelector("#test-set")
+            ?.addEventListener("click", testSetDoc, { passive: true });
       </script>
     </div>
   </body>

@@ -1,6 +1,5 @@
-use candid::Principal;
+use candid::{Nat, Principal};
 use ic_cdk::{call, print};
-use ic_ledger_types::Tokens;
 use junobuild_macros::{
     assert_delete_asset, assert_delete_doc, assert_set_doc, assert_upload_asset, on_delete_asset,
     on_delete_doc, on_delete_many_assets, on_delete_many_docs, on_set_doc, on_set_many_docs,
@@ -16,7 +15,7 @@ use junobuild_satellite::{
 async fn on_set_doc(_context: OnSetDocContext) -> Result<(), String> {
     let ledger_canister_id = Principal::from_text("np5km-uyaaa-aaaaq-aadrq-cai").unwrap();
 
-    let icrc1_fee: Tokens = call(ledger_canister_id, "icrc1_fee", ((),))
+    let icrc1_fee: Nat = call(ledger_canister_id, "icrc1_fee", ((),))
         .await
         .map(|response: (_,)| response.0)
         .map_err(|err| format!("Failed to get ledger fee: {err:?}"))?;
