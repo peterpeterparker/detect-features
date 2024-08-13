@@ -1,0 +1,79 @@
+use candid::Principal;
+use ic_cdk::{call, print};
+use ic_ledger_types::Tokens;
+use junobuild_macros::{
+    assert_delete_asset, assert_delete_doc, assert_set_doc, assert_upload_asset, on_delete_asset,
+    on_delete_doc, on_delete_many_assets, on_delete_many_docs, on_set_doc, on_set_many_docs,
+    on_upload_asset,
+};
+use junobuild_satellite::{
+    include_satellite, AssertDeleteAssetContext, AssertDeleteDocContext, AssertSetDocContext,
+    AssertUploadAssetContext, OnDeleteAssetContext, OnDeleteDocContext, OnDeleteManyAssetsContext,
+    OnDeleteManyDocsContext, OnSetDocContext, OnSetManyDocsContext, OnUploadAssetContext,
+};
+
+#[on_set_doc]
+async fn on_set_doc(_context: OnSetDocContext) -> Result<(), String> {
+    let ledger_canister_id = Principal::from_text("np5km-uyaaa-aaaaq-aadrq-cai").unwrap();
+
+    let icrc1_fee: Tokens = call(ledger_canister_id, "icrc1_fee", ((),))
+        .await
+        .map(|response: (_,)| response.0)
+        .map_err(|err| format!("Failed to get ledger fee: {err:?}"))?;
+
+    print(format!("Success {}", icrc1_fee));
+
+    Ok(())
+}
+
+#[on_set_many_docs]
+async fn on_set_many_docs(_context: OnSetManyDocsContext) -> Result<(), String> {
+    Ok(())
+}
+
+#[on_delete_doc]
+async fn on_delete_doc(_context: OnDeleteDocContext) -> Result<(), String> {
+    Ok(())
+}
+
+#[on_delete_many_docs]
+async fn on_delete_many_docs(_context: OnDeleteManyDocsContext) -> Result<(), String> {
+    Ok(())
+}
+
+#[on_upload_asset]
+async fn on_upload_asset(_context: OnUploadAssetContext) -> Result<(), String> {
+    Ok(())
+}
+
+#[on_delete_asset]
+async fn on_delete_asset(_context: OnDeleteAssetContext) -> Result<(), String> {
+    Ok(())
+}
+
+#[on_delete_many_assets]
+async fn on_delete_many_assets(_context: OnDeleteManyAssetsContext) -> Result<(), String> {
+    Ok(())
+}
+
+#[assert_set_doc]
+fn assert_set_doc(_context: AssertSetDocContext) -> Result<(), String> {
+    Ok(())
+}
+
+#[assert_delete_doc]
+fn assert_delete_doc(_context: AssertDeleteDocContext) -> Result<(), String> {
+    Ok(())
+}
+
+#[assert_upload_asset]
+fn assert_upload_asset(_context: AssertUploadAssetContext) -> Result<(), String> {
+    Ok(())
+}
+
+#[assert_delete_asset]
+fn assert_delete_asset(_context: AssertDeleteAssetContext) -> Result<(), String> {
+    Ok(())
+}
+
+include_satellite!();
