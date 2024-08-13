@@ -135,7 +135,7 @@ import { SITE_TITLE, SITE_DESCRIPTION, SITE_SOCIAL_IMAGE } from "../consts";
           const article = document.getElementById(id);
           const p = article?.querySelector("p");
 
-          if (p !== undefined) {
+          if (p !== undefined && p !== null) {
             p.innerHTML = available
               ? `Available`
               : `<strong>Not available</strong>`;
