@@ -1,0 +1,160 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Footer from "../components/Footer.astro";
+import Background from "../components/Background.astro";
+import Article from "../components/Article.astro";
+
+import { SITE_TITLE, SITE_DESCRIPTION, SITE_SOCIAL_IMAGE } from "../consts";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead
+      title={SITE_TITLE}
+      description={SITE_DESCRIPTION}
+      image={SITE_SOCIAL_IMAGE}
+    />
+  </head>
+  <body class="bg-white dark:bg-black">
+    <div class="relative isolate min-h-[100dvh]">
+      <main
+        class="mx-auto max-w-screen-2xl py-16 px-8 md:px-24 tall:min-h-[calc(100dvh-128px)]"
+      >
+        <h1
+          class="dark:text-white text-5xl md:text-6xl font-extrabold md:pt-16"
+        >
+          Detect Storage
+        </h1>
+
+        <div class="w-full max-w-2xl mt-8 grid grid-cols-2 gap-8">
+          <Article id="session-storage">
+            <Fragment slot="title">SessionStorage</Fragment>
+          </Article>
+
+          <Article id="local-storage">
+            <Fragment slot="title">LocalStorage</Fragment>
+          </Article>
+
+          <Article id="indexeddb">
+            <Fragment slot="title">IndexedDB</Fragment>
+          </Article>
+
+          <Article id="crypto">
+            <Fragment slot="title">Crypto</Fragment>
+          </Article>
+        </div>
+      </main>
+
+      <Footer />
+
+      <Background />
+
+      <script>
+        const testSessionStorage = async (): Promise<boolean> => {
+          if (!("sessionStorage" in window)) {
+            return false;
+          }
+
+          try {
+            const testKey = "sessionStorageKey";
+            sessionStorage.setItem(testKey, "value");
+            sessionStorage.removeItem(testKey);
+
+            return true;
+          } catch (err: unknown) {
+            return false;
+          }
+        };
+
+        const testLocalStorage = async (): Promise<boolean> => {
+          if (!("localStorage" in window)) {
+            return false;
+          }
+
+          try {
+            const testKey = "localStorageKey";
+            localStorage.setItem(testKey, "value");
+            localStorage.removeItem(testKey);
+
+            return true;
+          } catch (err: unknown) {
+            return false;
+          }
+        };
+
+        const testIndexedDb = (): Promise<boolean> => {
+          return new Promise<boolean>((resolve) => {
+            if (!("indexedDB" in window)) {
+              resolve(false);
+              return;
+            }
+
+            try {
+              const testDb = "indexedDBTest";
+              const request = indexedDB.open(testDb);
+
+              request.onsuccess = () => {
+                request.result.close();
+                indexedDB.deleteDatabase(testDb);
+
+                resolve(true);
+                return;
+              };
+
+              request.onerror = () => {
+                resolve(false);
+              };
+            } catch (err: unknown) {
+              resolve(false);
+            }
+          });
+        };
+
+        const testCrypto = async (): Promise<boolean> => {
+          if (!("crypto" in window)) {
+            return false;
+          }
+
+          try {
+            const array = new Uint32Array(10);
+            return crypto.getRandomValues(array) !== undefined;
+          } catch (err: unknown) {
+            return false;
+          }
+        }
+
+        const testFeature = async ({
+          fn,
+          id,
+        }: {
+          fn: () => Promise<boolean>;
+          id: string;
+        }): Promise<void> => {
+          const available = await fn();
+          const article = document.getElementById(id);
+          const p = article?.querySelector("p");
+
+          if (p !== undefined) {
+            p.innerHTML = available
+              ? `Available`
+              : `<strong>Not available</strong>`;
+          }
+        };
+
+        const testStorages = async () => {
+          const promises = [
+            testFeature({ fn: testSessionStorage, id: "session-storage" }),
+            testFeature({ fn: testLocalStorage, id: "local-storage" }),
+            testFeature({ fn: testIndexedDb, id: "indexeddb" }),
+            testFeature({ fn: testCrypto, id: "crypto" }),
+          ];
+
+          await Promise.allSettled(promises);
+        };
+
+        document.addEventListener("DOMContentLoaded", testStorages);
+      </script>
+    </div>
+  </body>
+</html>
